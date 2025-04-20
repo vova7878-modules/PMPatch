@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.v7878.unsafe.invoke.EmulatedStackFrame;
 import com.v7878.unsafe.invoke.Transformers;
-import com.v7878.vmtools.Hooks.HookTransformer;
+import com.v7878.vmtools.HookTransformer;
 
 public class HTF {
     public static class StackException extends Exception {

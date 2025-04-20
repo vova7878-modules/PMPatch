@@ -1,13 +1,12 @@
 package com.v7878.hooks.pmpatch;
 
-import static com.v7878.hooks.pmpatch.BuildConfig.DEBUG;
 import static com.v7878.hooks.pmpatch.Main.TAG;
-import static com.v7878.unsafe.Reflection.getDeclaredExecutables;
+import static com.v7878.unsafe.Reflection.getHiddenExecutables;
 
 import android.util.Log;
 
+import com.v7878.vmtools.HookTransformer;
 import com.v7878.vmtools.Hooks;
-import com.v7878.vmtools.Hooks.HookTransformer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,12 +44,12 @@ public class BulkHooker {
                 Log.e(TAG, String.format("Class %s not found", entry.getKey()));
                 continue;
             }
-            var executables = getDeclaredExecutables(clazz);
+            var executables = getHiddenExecutables(clazz);
             for (var element : entry.getValue()) {
                 Stream.of(executables)
                         .filter(Utils.filter(element.pattern()))
                         .forEach(executable -> {
-                            if (DEBUG) {
+                            if (BuildConfig.DEBUG) {
                                 Log.i(TAG, "Hooked: " + executable);
                             }
                             Hooks.hook(executable, Hooks.EntryPointType.DIRECT,

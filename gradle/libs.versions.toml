@@ -1,8 +1,8 @@
 [versions]
-agp = "8.8.0"
-zygisk = "fb7c2dc399"
-r8_annotations = "v0.0.2"
-androidvmtools = "98e96345b1"
+agp = "8.9.1"
+zygisk = "88a3d83d52"
+r8_annotations = "v0.0.3"
+androidvmtools = "95571c7efd"
 
 [libraries]
 androidvmtools = { module = "com.github.vova7878:AndroidVMTools", version.ref = "androidvmtools" }

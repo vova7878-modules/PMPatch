@@ -1,4 +1,4 @@
-import com.v7878.zygisk.gradle.ZygoteLoader
+import com.v7878.zygisk.gradle.ZygoteLoader;
 
 plugins {
     alias(libs.plugins.android.application)

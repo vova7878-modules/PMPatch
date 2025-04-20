@@ -8,7 +8,7 @@ import static com.v7878.unsafe.invoke.EmulatedStackFrame.RETURN_VALUE_IDX;
 
 import com.v7878.unsafe.AndroidUnsafe;
 import com.v7878.unsafe.invoke.Transformers;
-import com.v7878.vmtools.Hooks.HookTransformer;
+import com.v7878.vmtools.HookTransformer;
 import com.v7878.zygisk.ZygoteLoader;
 
 import java.security.Signature;
@@ -127,9 +127,6 @@ public class HookList {
                 default -> // 34 - >>
                         hooks.addAll(HTF.TRUE, "com.android.server.pm.permission.PermissionManagerServiceImpl", "getPrivilegedPermissionAllowlistState");
             }
-
-            // android oreo ???
-            //hooks.add(HTF.TODO, "com.android.server.pm.PackageManagerService", "scanPackageDirtyLI", "android.content.pm.PackageParser$Package", "android.content.pm.PackageParser$Package", "int", "int", "long", "android.os.UserHandle");
         }
     }
 
