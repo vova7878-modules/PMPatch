@@ -1,2 +1,2 @@
-- Added support for Android 16
-- On some devices, crashes of applications such as Google services, Bluetooth, etc. have been fixed
+- Support for the latest Android 16 changes
+- Fixed crashes for isolated processes
