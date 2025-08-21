@@ -11,16 +11,20 @@ public class EntryPoint {
         }
     }
 
-    public static void mainPreliminary() {
+    public static void premain() {
+        // nop
+    }
+
+    public static void mainCommon() {
         var loader = ClassLoader.getSystemClassLoader();
         printLoader(loader);
 
         var hooks = new BulkHooker();
-        HookList.initPreliminary(hooks);
+        HookList.initCommon(hooks);
         hooks.apply(loader);
     }
 
-    public static void mainSystem(ClassLoader loader) {
+    public static void mainSystemServer(ClassLoader loader) {
         printLoader(loader);
 
         var hooks = new BulkHooker();

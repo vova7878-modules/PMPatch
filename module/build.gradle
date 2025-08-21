@@ -1,4 +1,4 @@
-import com.v7878.zygisk.gradle.ZygoteLoader;
+import com.v7878.zygisk.gradle.ZygoteLoader
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,11 +9,11 @@ def updateJsonBase = "https://raw.githubusercontent.com/vova7878-modules/PMPatch
 
 android {
     namespace 'com.v7878.hooks.pmpatch'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         minSdk 26
-        targetSdk 35
+        targetSdk 36
         versionCode 1_001_000
         versionName "v1.1.0"
 
@@ -92,6 +92,8 @@ android {
             buildConfigField("boolean", "PATCH_3", "true")
             buildConfigField("boolean", "USE_CONFIG", "false")
         }
+        // Configurable version where you can enable and disable
+        // any of the patches without rebuilding (exists specifically for LuckyPatcher)
         LP {
             dimension "patch"
 
@@ -124,6 +126,8 @@ zygisk {
     author = "v7878"
     description = "Disable signature verification For Android"
     entrypoint = "com.v7878.hooks.pmpatch.Main"
+    attachNativeLibs = false
+    generateChecksums = true
 }
 
 dependencies {

@@ -36,7 +36,7 @@ public class HTF {
         } else {
             Log.e(TAG, "Unexpected return type: " + ret, new StackException());
             // run original
-            Transformers.invokeExactWithFrame(original, frame);
+            Transformers.invokeExact(original, frame);
         }
     };
 
@@ -80,7 +80,7 @@ public class HTF {
             }
 
             if (!run_flag || exclude_flag) {
-                Transformers.invokeExactWithFrame(original, frame);
+                Transformers.invokeExact(original, frame);
             } else {
                 if (frame.type().returnType() != void.class) {
                     frame.accessor().setValue(RETURN_VALUE_IDX, value);

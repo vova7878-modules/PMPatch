@@ -2,11 +2,13 @@ package com.v7878.hooks.pmpatch;
 
 import static android.content.pm.PackageManager.SIGNATURE_MATCH;
 import static android.os.Build.VERSION.SDK_INT;
-import static com.v7878.unsafe.Reflection.fieldOffset;
-import static com.v7878.unsafe.Reflection.getDeclaredField;
+import static com.v7878.unsafe.access.AccessLinker.FieldAccessKind.INSTANCE_GETTER;
 import static com.v7878.unsafe.invoke.EmulatedStackFrame.RETURN_VALUE_IDX;
 
-import com.v7878.unsafe.AndroidUnsafe;
+import com.v7878.r8.annotations.DoNotOptimize;
+import com.v7878.r8.annotations.DoNotShrinkType;
+import com.v7878.unsafe.access.AccessLinker;
+import com.v7878.unsafe.access.AccessLinker.FieldAccess;
 import com.v7878.unsafe.invoke.Transformers;
 import com.v7878.vmtools.HookTransformer;
 import com.v7878.zygisk.ZygoteLoader;
@@ -22,10 +24,17 @@ public class HookList {
         return true;
     }
 
-    public static void initPreliminary(BulkHooker hooks) {
-        if (BuildConfig.PATCH_1 && booleanProperty("PATCH_1")) {
-            int state_offset = fieldOffset(getDeclaredField(Signature.class, "state"));
+    @DoNotShrinkType
+    @DoNotOptimize
+    private abstract static class AccessI {
+        @FieldAccess(kind = INSTANCE_GETTER, klass = "java.security.Signature", name = "state")
+        abstract int state(Signature instance);
 
+        static final AccessI INSTANCE = AccessLinker.generateImpl(AccessI.class);
+    }
+
+    public static void initCommon(BulkHooker hooks) {
+        if (BuildConfig.PATCH_1 && booleanProperty("PATCH_1")) {
             HookTransformer verify_impl = (original, frame) -> {
                 HTF.printStackTrace(frame);
                 var accessor = frame.accessor();
@@ -33,7 +42,7 @@ public class HookList {
                 Signature thiz = accessor.getReference(0);
                 switch (thiz.getAlgorithm().toLowerCase()) {
                     case "rsa-sha1", "sha1withrsa", "sha256withdsa", "sha256withrsa" -> {
-                        int state = AndroidUnsafe.getIntO(thiz, state_offset);
+                        int state = AccessI.INSTANCE.state(thiz);
                         if (state == 3 /* Signature.VERIFY */) {
                             frame.accessor().setBoolean(RETURN_VALUE_IDX, true);
                             return;
@@ -41,7 +50,7 @@ public class HookList {
                     }
                 }
 
-                Transformers.invokeExactWithFrame(original, frame);
+                Transformers.invokeExact(original, frame);
             };
 
             hooks.addExact(verify_impl, "java.security.Signature", "verify", "boolean", "byte[]");
@@ -57,14 +66,16 @@ public class HookList {
 
     public static void initSystem(BulkHooker hooks) {
         if (BuildConfig.PATCH_3 && booleanProperty("PATCH_3")) {
-            if (SDK_INT >= 28) {
-                var impl = SDK_INT < 33 ? HTF.TRUE : HTF.constant(true, new String[]{"installPackagesLI", "preparePackageLI"}, null);
-                // 28 - >>
-                hooks.addAll(impl, "android.content.pm.PackageParser$SigningDetails", "checkCapability");
-            }
-            if (SDK_INT >= 33) {
-                // 33 - >>
-                hooks.addAll(HTF.constant(true, new String[]{"installPackagesLI", "preparePackageLI"}, new String[]{"reconcilePackages"}), "android.content.pm.SigningDetails", "checkCapability");
+            {
+                var impl = SDK_INT < 33 ? HTF.TRUE : HTF.constant(true, new String[]{"installPackagesLI", "preparePackageLI", "preparePackage"}, new String[]{"reconcilePackages"});
+                if (SDK_INT >= 28) {
+                    // 28 - >>
+                    hooks.addAll(impl, "android.content.pm.PackageParser$SigningDetails", "checkCapability");
+                }
+                if (SDK_INT >= 33) {
+                    // 33 - >>
+                    hooks.addAll(impl, "android.content.pm.SigningDetails", "checkCapability");
+                }
             }
 
             if (SDK_INT < 33) {
